@@ -5,7 +5,7 @@ import { ProjectItemCard } from "./ProjectItemCard";
 import { ProjectItemSkeleton } from "./ProjectItemSkeleton";
 
 const ProjectList = () => {
-  const { ownedProjects, otherProjects, loading, error } = useProjectsQuery();
+  const { ownedProjects, otherProjects, fetching: loading, error } = useProjectsQuery();
 
   return (
     <>

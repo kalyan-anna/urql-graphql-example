@@ -1,7 +1,7 @@
-import { useQuery } from "@apollo/client";
 import { gql } from "@generated/gql";
-import { NotificationStatus } from "@generated/graphql";
+import { Notification, NotificationStatus } from "@generated/graphql";
 import { useMemo } from "react";
+import { useQuery } from "urql";
 
 const NOTIFICATIONS_QUERY = gql(`
     query NOTIFICATIONS {
@@ -12,15 +12,16 @@ const NOTIFICATIONS_QUERY = gql(`
   `);
 
 export const useNotificationsQuery = () => {
-  return useQuery(NOTIFICATIONS_QUERY, { pollInterval: 20000 });
+  return useQuery({ query: NOTIFICATIONS_QUERY });
 };
 
 export const useNotificationsCountQuery = () => {
-  const result = useNotificationsQuery();
+  const [result] = useNotificationsQuery();
 
   return useMemo(() => {
     const unreadCount =
-      result.data?.notifications.filter((item) => item.status === NotificationStatus.Unread).length || 0;
+      (result.data?.notifications as Notification[])?.filter((item) => item.status === NotificationStatus.Unread)
+        .length || 0;
 
     return {
       ...result,

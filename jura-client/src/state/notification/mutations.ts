@@ -1,6 +1,7 @@
-import { MutationResult, useMutation } from "@apollo/client";
 import { gql } from "@generated/gql";
-import { Notification, NotificationStatus, UpdateNotificationMutation } from "@generated/graphql";
+import { Notification, NotificationStatus } from "@generated/graphql";
+import { useCallback } from "react";
+import { useMutation } from "urql";
 
 const UPDATE_NOTIFICATION_MUTATION = gql(`
     mutation UpdateNotification($id: String!, $status: NotificationStatus!) {
@@ -11,26 +12,20 @@ const UPDATE_NOTIFICATION_MUTATION = gql(`
 `);
 
 export const useReadNotificationMutation = (): [
-  (item: Notification) => void,
-  MutationResult<UpdateNotificationMutation>
+  ReturnType<typeof useMutation>[0],
+  (item: Notification) => Promise<void>
 ] => {
-  const [readNotification, result] = useMutation(UPDATE_NOTIFICATION_MUTATION);
+  const [result, readNotification] = useMutation(UPDATE_NOTIFICATION_MUTATION);
 
-  const readNotificationCb = (item: Notification) => {
-    readNotification({
-      variables: {
+  const readNotificationCb = useCallback(
+    async (item: Notification) => {
+      await readNotification({
         id: item.id,
         status: NotificationStatus.Read,
-      },
-      optimisticResponse: {
-        updateNotification: {
-          ...item,
-          __typename: "Notification",
-          status: NotificationStatus.Read,
-        },
-      },
-    });
-  };
+      });
+    },
+    [readNotification]
+  );
 
-  return [readNotificationCb, result];
+  return [result, readNotificationCb];
 };

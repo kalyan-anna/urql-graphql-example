@@ -1,15 +1,8 @@
-import { MutationFunctionOptions, MutationResult, useMutation } from "@apollo/client";
 import { gql } from "@generated/gql";
-import {
-  CreateSprintMutation,
-  SprintCreateInput,
-  SprintStatus,
-  UpdateSprintMutation,
-  UpdateSprintMutationVariables,
-} from "@generated/graphql";
+import { SprintCreateInput, SprintStatus } from "@generated/graphql";
 import { useParams } from "react-router";
+import { useMutation } from "urql";
 import { sprintDialog } from "../ui-dialog";
-import { SPRINTS_QUERY } from "./queries";
 
 const CREATE_SPRINT_MUTATION = gql(`
     mutation CreateSprint($input: SprintCreateInput!) {
@@ -28,64 +21,55 @@ const UPDATE_SPRINT_MUTATION = gql(`
 `);
 
 export const useCreateSprintMutation = (): [
-  (data: SprintCreateInput) => void,
-  MutationResult<CreateSprintMutation>
+  ReturnType<typeof useMutation>[0],
+  (data: SprintCreateInput) => Promise<void>
 ] => {
-  const [createSprint, result] = useMutation(CREATE_SPRINT_MUTATION);
+  const [result, createSprint] = useMutation(CREATE_SPRINT_MUTATION);
   const { closeDialog } = sprintDialog.useDialogState();
   const { projectId = "" } = useParams();
 
-  const createSprintCb = (data: SprintCreateInput) => {
-    createSprint({
-      variables: {
-        input: {
-          ...data,
-        },
+  const createSprintCb = async (data: SprintCreateInput) => {
+    await createSprint({
+      input: {
+        ...data,
+        projectId,
       },
-      onCompleted: closeDialog,
-      refetchQueries: [{ query: SPRINTS_QUERY, variables: { projectId } }],
     });
+    closeDialog();
   };
 
-  return [createSprintCb, result];
+  return [result, createSprintCb];
 };
-
-type MutationOptions = Omit<MutationFunctionOptions<UpdateSprintMutation, UpdateSprintMutationVariables>, "variables">;
 
 export const useCompleteSprintMutation = (): [
-  (sprintId: string, options?: MutationOptions) => void,
-  MutationResult<UpdateSprintMutation>
+  ReturnType<typeof useMutation>[0],
+  (sprintId: string) => Promise<void>
 ] => {
-  const [updateSprint, result] = useMutation(UPDATE_SPRINT_MUTATION);
+  const [result, updateSprint] = useMutation(UPDATE_SPRINT_MUTATION);
 
-  const updateSprintFn = (sprintId: string, options?: MutationOptions) => {
-    updateSprint({
-      variables: {
-        input: {
-          id: sprintId,
-          status: SprintStatus.Completed,
-        },
+  const updateSprintFn = async (sprintId: string) => {
+    await updateSprint({
+      input: {
+        id: sprintId,
+        status: SprintStatus.Completed,
       },
-      ...options,
     });
   };
 
-  return [updateSprintFn, result];
+  return [result, updateSprintFn];
 };
 
-export const useStartSprintMutation = (): [(sprintId: string) => void, MutationResult<UpdateSprintMutation>] => {
-  const [updateSprint, result] = useMutation(UPDATE_SPRINT_MUTATION);
+export const useStartSprintMutation = (): [ReturnType<typeof useMutation>[0], (sprintId: string) => Promise<void>] => {
+  const [result, updateSprint] = useMutation(UPDATE_SPRINT_MUTATION);
 
-  const updateSprintFn = (sprintId: string) => {
-    updateSprint({
-      variables: {
-        input: {
-          id: sprintId,
-          status: SprintStatus.Active,
-        },
+  const updateSprintFn = async (sprintId: string) => {
+    await updateSprint({
+      input: {
+        id: sprintId,
+        status: SprintStatus.Active,
       },
     });
   };
 
-  return [updateSprintFn, result];
+  return [result, updateSprintFn];
 };

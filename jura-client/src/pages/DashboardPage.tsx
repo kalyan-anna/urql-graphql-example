@@ -6,7 +6,7 @@ import { useCurrentUserQuery } from "../state/user";
 import { ProtectedTemplate } from "../templates/ProtectedTemplate";
 
 export const DashboardPage = () => {
-  const { data, loading } = useCurrentUserQuery();
+  const { data, fetching: loading } = useCurrentUserQuery();
   const { setLastVisitedProjectId } = useUIPreferenceState();
 
   useEffect(() => {

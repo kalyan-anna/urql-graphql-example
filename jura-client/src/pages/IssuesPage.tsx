@@ -4,18 +4,18 @@ import { Link, useParams } from "react-router";
 import { SprintContainer } from "../components/SprintContainer";
 import { SprintContainerSkeleton } from "../components/SprintContainerSkeleton";
 import { useBacklogIssuesQuery } from "../state/issue";
+import { useProjectQuery } from "../state/project";
 import { useCompletedSprintsQuery, useUnCompletedSprintsQuery } from "../state/sprint";
 import { issueDialog, sprintDialog } from "../state/ui-dialog";
-import { useProjectQuery } from "../state/project";
-import { Toast } from "../components/design-system/Toast";
+import { Issue } from "@generated/graphql";
 
 export const IssuesPage = () => {
   const { projectId = "" } = useParams();
-  const { data: backlogData, loading: isBacklogLoading } = useBacklogIssuesQuery(projectId);
-  const { data: sprintsData, loading: isSprintLoading } = useUnCompletedSprintsQuery({
+  const [{ data: backlogData, fetching: isBacklogLoading }] = useBacklogIssuesQuery(projectId);
+  const { data: sprintsData, fetching: isSprintLoading } = useUnCompletedSprintsQuery({
     projectId: projectId,
   });
-  const { data: completedData, loading: isCompletedSprintLoading } = useCompletedSprintsQuery({
+  const { data: completedData, fetching: isCompletedSprintLoading } = useCompletedSprintsQuery({
     projectId: projectId,
   });
   const loadingSprints = isBacklogLoading || isSprintLoading || isCompletedSprintLoading;
@@ -73,7 +73,7 @@ export const IssuesPage = () => {
           ))}
         {isBacklogLoading && <SprintContainerSkeleton />}
         {!isBacklogLoading && (backlogData?.issues?.length ?? 0) > 0 && (
-          <SprintContainer name="Backlog" issues={backlogData?.issues} />
+          <SprintContainer name="Backlog" issues={backlogData?.issues as Issue[]} />
         )}
         {isCompletedSprintLoading && <SprintContainerSkeleton />}
         {!isCompletedSprintLoading &&

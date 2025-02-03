@@ -1,7 +1,6 @@
-import { MutationFunctionOptions, MutationResult, useApolloClient, useMutation } from "@apollo/client";
 import { gql } from "@generated/gql";
-import { UpdateUserMutation, UpdateUserMutationVariables, User, UserUpdateInput } from "@generated/graphql";
-import { USER_QUERY } from "./queries";
+import { UserUpdateInput } from "@generated/graphql";
+import { useMutation } from "urql";
 
 const UPDATE_USER_MUTATION = gql(`
     mutation UpdateUser($input: UserUpdateInput!) {
@@ -11,24 +10,19 @@ const UPDATE_USER_MUTATION = gql(`
     }
 `);
 
-type MutationOptions = Omit<MutationFunctionOptions<UpdateUserMutation, UpdateUserMutationVariables>, "variables">;
-
 export const useUpdateUserMutation = (): [
-  (data: UserUpdateInput, options?: MutationOptions) => void,
-  MutationResult<UpdateUserMutation>
+  ReturnType<typeof useMutation>[0],
+  (data: UserUpdateInput) => Promise<void>
 ] => {
-  const [updateUser, result] = useMutation(UPDATE_USER_MUTATION);
+  const [result, updateUser] = useMutation(UPDATE_USER_MUTATION);
 
-  const updateUserFn = (data: UserUpdateInput, options?: MutationOptions) => {
-    updateUser({
-      variables: {
-        input: {
-          ...data,
-        },
+  const updateUserFn = async (data: UserUpdateInput) => {
+    await updateUser({
+      input: {
+        ...data,
       },
-      ...options,
     });
   };
 
-  return [updateUserFn, result];
+  return [result, updateUserFn];
 };

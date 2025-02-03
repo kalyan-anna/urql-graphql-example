@@ -1,5 +1,5 @@
 import { gql } from "@generated/gql";
-import { useQuery } from "@apollo/client";
+import { useQuery } from "urql";
 
 export const BACKLOG_ISSUES_QUERY = gql(`
   query BACKLOG_ISSUES($projectId: String!) {
@@ -10,7 +10,8 @@ export const BACKLOG_ISSUES_QUERY = gql(`
   `);
 
 export const useBacklogIssuesQuery = (projectId: string) => {
-  return useQuery(BACKLOG_ISSUES_QUERY, {
+  return useQuery({
+    query: BACKLOG_ISSUES_QUERY,
     variables: {
       projectId,
     },

@@ -1,6 +1,8 @@
-# JURA - Kanban Project Tool
+# URQL + Jotai State Management Example
 
-This is an example project of using Apollo GraphQL for state management along with Jotai.
+This project demonstrates how to use URQL GraphQL for state management in combination with Jotai.
+
+Originally, this was an alternative approach to [Apollo GraphQL Example](https://github.com/kalyan-anna/react-apollo-graphql-example). However, not fully completed and left midway due to URQL's reexecute functions being less sophisticated compared to Apollo GraphQL.
 
 ## Setup Instructions
 
@@ -21,4 +23,4 @@ npm run dev
 ```
 
 ## Devtools
-https://chromewebstore.google.com/detail/apollo-client-devtools/jdkknkkbebbapilgoeccciglkfbmbnfm
+Doesn't work lol

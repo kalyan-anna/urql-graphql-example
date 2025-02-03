@@ -17,7 +17,7 @@ type FormValues = yup.InferType<typeof schema>;
 
 export function ProfileForm() {
   const { data } = useCurrentUserQuery();
-  const [updateUser, { loading }] = useUpdateUserMutation();
+  const [{ fetching: loading }, updateUser] = useUpdateUserMutation();
   const { currentUserId } = useAuthState();
   const navigate = useNavigate();
 
@@ -29,8 +29,8 @@ export function ProfileForm() {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      email: data?.user?.email,
-      name: data?.user?.name,
+      email: data?.email,
+      name: data?.name,
     },
     disabled: loading,
   });
@@ -38,24 +38,18 @@ export function ProfileForm() {
   useEffect(() => {
     if (data) {
       reset({
-        email: data?.user?.email,
-        name: data?.user?.name,
+        email: data?.email,
+        name: data?.name,
       });
     }
   }, [data, reset]);
 
-  const onSubmit = (data: FormValues) => {
-    updateUser(
-      {
-        id: currentUserId ?? "",
-        name: data.name,
-      },
-      {
-        onCompleted: () => {
-          navigate("/dashboard");
-        },
-      }
-    );
+  const onSubmit = async (data: FormValues) => {
+    await updateUser({
+      id: currentUserId ?? "",
+      name: data.name,
+    });
+    navigate("/dashboard");
   };
 
   const handleCancelClick = () => {

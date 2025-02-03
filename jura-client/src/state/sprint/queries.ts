@@ -1,8 +1,8 @@
-import { IssueStatus, SprintStatus } from "@generated/graphql";
+import { IssueStatus, Sprint, SprintStatus } from "@generated/graphql";
 
-import { useQuery } from "@apollo/client";
 import { gql } from "@generated/gql";
 import { useMemo } from "react";
+import { useQuery } from "urql";
 
 export const SPRINTS_QUERY = gql(`
     query SPRINTS($projectId: String!) {
@@ -16,7 +16,8 @@ export const SPRINTS_QUERY = gql(`
 `);
 
 export const useSprintsQuery = ({ projectId }: { projectId: string }) => {
-  return useQuery(SPRINTS_QUERY, {
+  return useQuery({
+    query: SPRINTS_QUERY,
     variables: {
       projectId,
     },
@@ -24,11 +25,11 @@ export const useSprintsQuery = ({ projectId }: { projectId: string }) => {
 };
 
 export const useUnCompletedSprintsQuery = ({ projectId }: { projectId: string }) => {
-  const result = useSprintsQuery({ projectId });
+  const [result] = useSprintsQuery({ projectId });
 
   return useMemo(() => {
-    const uncompleted = result.data?.sprints
-      .filter((sprint) => sprint.status !== SprintStatus.Completed)
+    const uncompleted = (result.data?.sprints as Sprint[])
+      ?.filter((sprint) => sprint.status !== SprintStatus.Completed)
       .sort((a, b) => {
         if (a.status === SprintStatus.Active && b.status !== SprintStatus.Active) {
           return -1;
@@ -46,10 +47,10 @@ export const useUnCompletedSprintsQuery = ({ projectId }: { projectId: string })
 };
 
 export const useCompletedSprintsQuery = ({ projectId }: { projectId: string }) => {
-  const result = useSprintsQuery({ projectId });
+  const [result] = useSprintsQuery({ projectId });
 
   return useMemo(() => {
-    const completed = result.data?.sprints.filter((sprint) => sprint.status === SprintStatus.Completed);
+    const completed = (result.data?.sprints as Sprint[])?.filter((sprint) => sprint.status === SprintStatus.Completed);
 
     return {
       ...result,
@@ -59,10 +60,10 @@ export const useCompletedSprintsQuery = ({ projectId }: { projectId: string }) =
 };
 
 export const useActiveSprintQuery = ({ projectId }: { projectId: string }) => {
-  const result = useSprintsQuery({ projectId });
+  const [result] = useSprintsQuery({ projectId });
 
   return useMemo(() => {
-    const activeSprint = result.data?.sprints.find((sprint) => sprint.status === SprintStatus.Active);
+    const activeSprint = (result.data?.sprints as Sprint[])?.find((sprint) => sprint.status === SprintStatus.Active);
 
     return {
       ...result,

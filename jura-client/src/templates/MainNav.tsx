@@ -94,7 +94,7 @@ interface MainNavProps {
 }
 
 export const MainNav = ({ withProfileMenu = true }: MainNavProps) => {
-  const { data, loading } = useCurrentUserQuery();
+  const { data, fetching: loading } = useCurrentUserQuery();
   const { length } = useNotificationsCountQuery();
 
   return (
@@ -117,7 +117,7 @@ export const MainNav = ({ withProfileMenu = true }: MainNavProps) => {
             <div className="flex gap-4 justify-center items-center">
               {!loading && (
                 <Typography color="blue-gray" variant="lead">
-                  {data?.user?.name}
+                  {data?.name}
                 </Typography>
               )}
               <ProfileMenu />

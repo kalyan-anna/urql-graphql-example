@@ -3,23 +3,23 @@ import "./index.css";
 
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 
-import { ActiveSprintPage } from "./pages/ActiveSprintPage.tsx";
-import { ApolloProvider } from "@apollo/client";
-import { DashboardPage } from "./pages/DashboardPage.tsx";
+import { ThemeProvider } from "@material-tailwind/react";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { Provider } from "urql";
 import ErrorBoundary from "./components/ErrorBoundary.tsx";
+import { ActiveSprintPage } from "./pages/ActiveSprintPage.tsx";
+import { DashboardPage } from "./pages/DashboardPage.tsx";
 import { IndexPage } from "./pages/IndexPage.tsx";
 import { IssuesPage } from "./pages/IssuesPage.tsx";
 import { LoginPage } from "./pages/LoginPage.tsx";
-import { ProjectPage } from "./pages/ProjectPage.tsx";
-import { StrictMode } from "react";
-import { ThemeProvider } from "@material-tailwind/react";
-import { client } from "./utils/client.helper.ts";
-import { createRoot } from "react-dom/client";
 import { ProfilePage } from "./pages/ProfilePage.tsx";
+import { ProjectPage } from "./pages/ProjectPage.tsx";
+import { client } from "./utils/client.helper.ts";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ApolloProvider client={client}>
+    <Provider value={client}>
       <BrowserRouter>
         <ErrorBoundary>
           <ThemeProvider>
@@ -37,6 +37,6 @@ createRoot(document.getElementById("root")!).render(
           </ThemeProvider>
         </ErrorBoundary>
       </BrowserRouter>
-    </ApolloProvider>
+    </Provider>
   </StrictMode>
 );

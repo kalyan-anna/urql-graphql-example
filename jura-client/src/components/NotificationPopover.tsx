@@ -19,8 +19,8 @@ interface NotificationPopoverProps {
 }
 export const NotificationPopover = ({ children }: NotificationPopoverProps) => {
   const [isOpen, setOpen] = useAtom(notificationPopoverAtom);
-  const { data, loading } = useNotificationsQuery();
-  const [readNotification] = useReadNotificationMutation();
+  const [{ data, fetching: loading }] = useNotificationsQuery();
+  const [, readNotification] = useReadNotificationMutation();
 
   const handleItemClick = (item: Notification) => {
     if (item.status === NotificationStatus.Unread) {
@@ -47,7 +47,7 @@ export const NotificationPopover = ({ children }: NotificationPopoverProps) => {
             </div>
           )}
           {!loading &&
-            data?.notifications.map((item) => (
+            (data?.notifications as Notification[])?.map((item) => (
               <div key={item.id} className="border-b-2 border-gray-200 p-2">
                 <ListItem onClick={() => handleItemClick(item)}>
                   {item.status === NotificationStatus.Unread && (
